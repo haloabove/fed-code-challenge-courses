@@ -52,6 +52,7 @@ export default {
   color: #2c3e50;
 }
 .navbar {
+  background-color: #80808052;
   a {
     margin: 1rem auto;
   }

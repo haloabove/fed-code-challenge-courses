@@ -29,6 +29,7 @@
         </b-input-group>
         <b-table></b-table>
       </b-overlay>
+      <filters></filters>
     </b-col>
     <b-col lg="12">
       <b-table
@@ -38,8 +39,8 @@
         sticky-header
         class="table table-striped"
         sort-desc
-        :fields="headers"
-        :items="wordList"
+        :fields="fields"
+        :items="itemList"
         :bordered="true"
         :hover="true"
         :current-page="currentPage"
@@ -49,6 +50,31 @@
         responsive
         tbody-tr-class="materials_table-row"
       >
+        <template #cell(actions)="row">
+          <b-button
+            size="sm"
+            @click="row.toggleDetails"
+            :disabled="row.item.pets == null"
+            class="mr-2"
+          >
+            {{ row.detailsShowing ? "Hide" : "Show" }} Details
+          </b-button>
+        </template>
+
+        <template #row-details="row">
+          <b-row>
+            <b-col>
+              <b-list-group>
+                <b-list-group-item
+                  v-for="(pet, index) in row.item.pets"
+                  :key="index"
+                >
+                  Pet: {{ pet.name }}, {{ pet.type }}</b-list-group-item
+                >
+              </b-list-group>
+            </b-col>
+          </b-row>
+        </template>
         <template v-slot:footer> </template>
       </b-table>
       <b-pagination
@@ -76,20 +102,35 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
-import { mapActions } from "vuex";
+import Filters from "@/components/views/general/Filters.vue";
 
 export default {
   name: "Search",
+  components: {
+    Filters,
+  },
   data() {
     return {
-      headers: [
+      fields: [
         {
-          label: "id",
-          key: "id",
+          label: "Name",
+          key: "name",
         },
         {
-          label: "Word",
-          key: "word",
+          age: "Age",
+          age: "age",
+        },
+        {
+          label: "City",
+          key: "city",
+        },
+        {
+          label: "Gender",
+          key: "gender",
+        },
+        {
+          label: "Pets",
+          key: "actions",
         },
       ],
       search: "",
@@ -101,7 +142,7 @@ export default {
     ...mapGetters({
       perPage: "getPerPage",
       busy: "getBusy",
-      wordList: "getFilteredWords",
+      itemList: "getFilteredItems",
     }),
     preSearch: {
       get() {
@@ -112,7 +153,7 @@ export default {
       },
     },
     totalRowsLenght() {
-      return this.wordList.length;
+      return this.itemList.length;
     },
   },
   methods: {

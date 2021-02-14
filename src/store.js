@@ -7,37 +7,76 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    selectedWord: [],
-    wordList: [],
+    itemList: [],
     count: 0,
-    perPage: 20,
+    perPage: 5,
     loading: false,
-    selectedWord: null,
     userInput: '',
-    currentPage: 1
+    currentPage: 1,
+    cities: [],
+    selectedCities: [],
+    petTypes: [],
+    selectedPetTypes: [],
   },
   getters: {
+    getCityOptions: state => {
+      return state.cities;
+    },
+    getSelectedCities: state => {
+      return state.selectedCities;
+    },
+    getPetOptions: state => {
+      return state.petTypes;
+    },
+    getSelectedPetTypes: state => {
+      return state.selectedPetTypes;
+    },
     getPerPage: state => {
       return state.perPage;
     },
     getUserInput: state => {
       return state.userInput;
     },
-    getSelectedWord: state => {
-      return state.selectedWord;
-    },
     getBusy: state => {
       return state.loading
     },
-    getWordList: state => {
-      return state.wordList;
+    getItemList: state => {
+      return state.itemList;
     },
     getAllWords: state => {
-      return state.wordList;
+      return state.itemList;
     },
-    getFilteredWords: state => {
-      return state.wordList.filter(i => {
-        return i.word.toLowerCase().indexOf(state.userInput.toLowerCase()) > -1
+    getFilteredItems: state => {
+      return state.itemList.filter(i => {
+        let checkInSelectedPet = false;
+        let checkInSelectedCity = false;
+
+        if (state.selectedPetTypes.length > 0) {
+          if (state.selectedPetTypes.some(t => {
+            return (
+              i.pets != null && i.pets.find((pet) => pet.type == t.name)
+            )
+          })) {
+            checkInSelectedPet = true;
+          }
+        } else {
+          checkInSelectedPet = true;
+        }
+
+        if (state.selectedCities.length > 0) {
+          if (state.selectedCities.some(t => i.city == t.name)) {
+            checkInSelectedCity = true;
+          }
+        } else {
+          checkInSelectedCity = true;
+        }
+
+        return (i.city.toLowerCase().indexOf(state.userInput.toLowerCase()) > -1 ||
+          i.name.toLowerCase().indexOf(state.userInput.toLowerCase()) > -1 ||
+          i.age.toString().toLowerCase().indexOf(state.userInput.toLowerCase()) > -1 ||
+          i.gender.toLowerCase().indexOf(state.userInput.toLowerCase()) > -1)
+          && checkInSelectedCity
+          && checkInSelectedPet
       })
     },
     getTotal: state => {
@@ -48,19 +87,17 @@ export default new Vuex.Store({
     },
   },
   mutations: {
+    setSelectedCities(state, payload) {
+      state.selectedCities = payload;
+    },
+    setSelectedPets(state, payload) {
+      state.selectedPetTypes = payload;
+    },
     clearInput(state) {
       state.userInput = '';
     },
-    setWords(state, payload) {
-      state.wordList = payload.map((word, index) => {
-        return {
-          id: index,
-          word: word
-        }
-      });
-    },
-    setTotalItems(state, payload) {
-      state.count = payload;
+    setItems(state, payload) {
+      state.itemList = payload;
     },
     setLoadingStatus(state, payload) {
       state.loading = payload;
@@ -71,30 +108,72 @@ export default new Vuex.Store({
     setPage(state, payload) {
       state.currentPage = payload;
     },
+    clearSelectionFilters(state) {
+      state.selectedCities = [];
+      state.selectedPetTypes = [];
+    },
+    setFilterOptions(state, payload) {
+      state.cities = [...new Set(payload.map(c => c.city))];
+      let petTypes = [];
+      payload.filter(i => i.pets !== null).forEach(items => {
+        items.pets.forEach((pet) => {
+          if (petTypes.filter(e => e.type === pet.type).length == 0) {
+            petTypes.push({ type: pet.type });
+          }
+        })
+      });
+      state.petTypes = petTypes;
+    }
   },
   actions: {
-    clearUserInput({ commit }, payload) {
-      commit('clearInput', payload)
+    setSelectedCities({ commit }, payload) {
+      commit('setSelectedCities', payload);
     },
-    setCurrentPage({ commit }, payload) {
-      commit('setPage', payload)
+    setSelectedPetTypes({ commit }, payload) {
+      commit('setSelectedPets', payload);
+    },
+    clearUserInput({ commit }, payload) {
+      commit('clearInput', payload);
     },
     setInput({ commit }, payload) {
-      commit('setInputToStore', payload)
+      commit('setInputToStore', payload);
     },
-    loadWordToStore({ commit }, payload) {
-      commit('setWord', payload);
+    clearFilters({ commit }) {
+      commit("clearSelectionFilters");
     },
     async getProductsAndCategories({ commit, state }, payload) {
       commit('setLoadingStatus', true);
-      await axios.get(`https://gist.githubusercontent.com/adamc00/a45beb8a0cb55593220f749838c534d0/raw/fd11dcce5df4098839e19f21c50cc2363b9b7863/words.txt`)
-        .then(response => {
-          let list = response.data.split("\n");
-          commit('setTotalItems', list.length);
-          commit('setWords', list);
-        }).then(response => {
-          commit('setLoadingStatus', false);
-        })
+
+
+      let mel = "https://dorsavicodechallenge.azurewebsites.net/Melbourne";
+      let syd = "https://dorsavicodechallenge.azurewebsites.net/Sydney";
+      const getMel = axios.get(mel);
+      const getSyd = axios.get(syd);
+
+      axios.all([getMel, getSyd]).then(axios.spread((...responses) => {
+        const responseMel = responses[0].data.map(item => {
+          return {
+            ...item,
+            city: 'Melbourne'
+          }
+        });
+        const responseSyd = responses[1].data.map(item => {
+          return {
+            ...item,
+            city: 'Sydney'
+          }
+        });
+
+        const itemsWithOrigin = [...responseMel, ...responseSyd];
+
+        commit('setItems', itemsWithOrigin);
+        commit('setFilterOptions', itemsWithOrigin);
+      })).then(response => {
+        commit('setLoadingStatus', false);
+      }).catch(errors => {
+        console.log(errors);
+      });
+
     },
   }
 })
