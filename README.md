@@ -1,5 +1,5 @@
 # isobaraustralia/fed-code-challenge-courses
-## Libraries setup
+## Setup
 
 -install Npm (https://www.npmjs.com/get-npm).
 
@@ -26,8 +26,6 @@ npm run build
 ### Run your end-to-end tests
 ```
 npm run test:e2e
-
-### Customize configuration
 
 Libraries used :
   [Bootstrap vue](https://bootstrap-vue.org)
