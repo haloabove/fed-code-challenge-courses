@@ -4,6 +4,7 @@ import router from './router'
 import store from './store'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import Multiselect from 'vue-multiselect';
+Vue.use(require('vue-moment'))
 
 Vue.component('multiselect', Multiselect);
 Vue.use(BootstrapVue)

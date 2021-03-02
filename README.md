@@ -1,4 +1,4 @@
-# Search
+# isobaraustralia/fed-code-challenge-courses
 ## Libraries setup
 
 -install Npm (https://www.npmjs.com/get-npm).
@@ -23,12 +23,16 @@ npm run serve
 ```
 npm run build
 ```
+### Run your end-to-end tests
+```
+npm run test:e2e
 
 ### Customize configuration
-# search
+
 Libraries used :
   [Bootstrap vue](https://bootstrap-vue.org)
-  [Axios](https://www.npmjs.com/package/axios)
   [VueX](https://vuex.vuejs.org) 
   [VueCLI](https://cli.vuejs.org)
+  [Vue-Multiselect](https://vue-multiselect.js.org)
+  [Vue-Moment](https://www.npmjs.com/package/vue-moment)
 

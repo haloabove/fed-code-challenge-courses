@@ -1,9 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from './components/views/Home.vue'
-import About from './components/views/About.vue'
-import Contact from './components/views/Contact.vue'
-import store from './store.js'
+import Home from './pages/Home.vue'
+import LogIn from './components/Login.vue'
 
 Vue.use(Router)
 
@@ -15,23 +13,18 @@ const router = new Router({
       component: Home
     },
     {
-      path: '/about',
-      name: 'about',
-      component: About
-    },
-    {
-      path: '/contact',
-      name: 'contact',
-      component: Contact
+      path: '/logIn',
+      name: 'LogIn',
+      component: LogIn
     },
   ]
 });
 
-router.beforeEach((to, from, next) => {
-  if (store.state.selectedProduct == undefined && to.name == "product") {
-    next({ name: 'home' })
-  }
-  next();
-})
+// router.beforeEach((to, from, next) => {
+//   if (store.state.selectedProduct == undefined && to.name == "product") {
+//     next({ name: 'home' })
+//   }
+//   next();
+// })
 
 export default router

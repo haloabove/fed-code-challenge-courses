@@ -1,8 +1,8 @@
 <template>
   <b-row>
-    <div class="navbar fixed-bottom">
+    <footer class="mastfoot mt-auto navbar fixed-bottom">
       <span>Tim Jovchevski</span><span> {{ year }}</span>
-    </div>
+    </footer>
   </b-row>
 </template>
 <script>
