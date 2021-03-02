@@ -105,6 +105,7 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
+import { mapActions } from "vuex";
 import Filters from "@/components/Filters.vue";
 
 export default {
@@ -162,22 +163,28 @@ export default {
     },
   },
   methods: {
+    ...mapActions([
+      "clearUserInput",
+      "addItemToCart",
+      "removeItemFromCart",
+      "setInput",
+    ]),
     addItem(item, index) {
       if (this.loggedIn) {
-        this.$store.dispatch("addItemToCart", { ...item, index });
+        this.addItemToCart({ ...item, index });
       } else {
         this.tempSelection = { ...item, index };
         this.$root.$emit("bv::show::modal", "login-modal");
       }
     },
     removeItem(item, index) {
-      this.$store.dispatch("removeItemFromCart", { ...item, index });
+      this.removeItemFromCart({ ...item, index });
     },
     preformSearch() {
-      this.$store.dispatch("setInput", this.search);
+      this.setInput(this.search);
     },
     clearSearch(val) {
-      if (val == "") this.$store.dispatch("clearUserInput", {});
+      if (val == "") this.clearUserInput();
     },
     showToast() {
       const h = this.$createElement;
@@ -203,7 +210,7 @@ export default {
   watch: {
     loggedIn() {
       this.$root.$emit("bv::hide::modal", "login-modal");
-      this.$store.dispatch("addItemToCart", this.tempSelection);
+      this.addItemToCart(this.tempSelection);
       this.showToast();
     },
   },

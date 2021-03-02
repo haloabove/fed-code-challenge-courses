@@ -33,6 +33,7 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
+import { mapActions } from "vuex";
 
 export default {
   data() {
@@ -44,8 +45,9 @@ export default {
     }),
   },
   methods: {
+    ...mapActions(["removeItemFromCart"]),
     removeItem(item) {
-      this.$store.dispatch("removeItemFromCart", item);
+      this.removeItemFromCart(item);
     },
   },
 };
